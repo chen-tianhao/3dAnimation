@@ -195,6 +195,8 @@ function createSpreader(name, color = COLOR.platform) {
     lightBar.position.set(0, -0.4, 1.6);
     spreader.add(lightBar);
 
+    spreader.rotation.y = Math.PI / 2;  // Rotate spreader to be parallel to coastline
+
     return spreader;
 }
 
