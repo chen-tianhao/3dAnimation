@@ -98,6 +98,7 @@ function createCable(from, to, radius = 0.08) {
     cable.position.copy(from).addScaledVector(delta, 0.5);
     cable.lookAt(to);
     cable.rotateX(Math.PI / 2);
+    cable.rotation.y = Math.PI / 2;  // Rotate cable 90 degrees
     cable.castShadow = true;
     return cable;
 }
@@ -195,7 +196,7 @@ function createSpreader(name, color = COLOR.platform) {
     lightBar.position.set(0, -0.4, 1.6);
     spreader.add(lightBar);
 
-    spreader.rotation.y = Math.PI / 2;  // Rotate spreader to be parallel to coastline
+    // spreader.rotation.y = Math.PI / 2;  // Rotate spreader to be parallel to coastline
 
     return spreader;
 }
@@ -210,11 +211,12 @@ function createHoistAssembly(spreaderName, travelRange, hoistDepth, axis = 'x') 
     );
     trolley.name = `${spreaderName}Trolley`;
     trolley.position.set(0, 2, 0);
+    trolley.rotation.y = Math.PI / 2;  // Rotate trolley 90 degrees
     trolley.castShadow = true;
     trolley.receiveShadow = true;
     group.add(trolley);
 
-    const machinery = new THREE.Mesh(new THREE.BoxGeometry(6, 2, 4.2), createMaterial(COLOR.gantryAccent));
+        const machinery = new THREE.Mesh(new THREE.BoxGeometry(6, 2, 4.2), createMaterial(COLOR.gantryAccent));
     machinery.position.set(0, 4.2, 0);
     machinery.castShadow = true;
     trolley.add(machinery);
