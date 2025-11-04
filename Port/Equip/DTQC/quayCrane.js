@@ -371,39 +371,39 @@ export class DualTrolleyQuayCrane extends THREE.Group {
         gantry.add(boomGroup);
 
         const boom = new THREE.Mesh(new THREE.BoxGeometry(VECTOR.boomOutreach, 4.2, 6), createMaterial(COLOR.gantry));
-        boom.position.set(VECTOR.boomOutreach / 2, VECTOR.towerHeight + 10, -4);
+        boom.position.set(VECTOR.boomOutreach / 2, VECTOR.towerHeight + 10, 0);
         boom.rotation.z = THREE.MathUtils.degToRad(0);
         boom.castShadow = true;
         boom.receiveShadow = true;
         boomGroup.add(boom);
 
         const boomTruss = new THREE.Mesh(new THREE.BoxGeometry(VECTOR.boomOutreach + 6, 2.4, 4.2), createMaterial(COLOR.gantryAccent));
-        boomTruss.position.set(VECTOR.boomOutreach / 2 + 3, VECTOR.towerHeight + 12, -4);
+        boomTruss.position.set(VECTOR.boomOutreach / 2 + 3, VECTOR.towerHeight + 12, 0);
         boomTruss.rotation.z = THREE.MathUtils.degToRad(0);
         boomTruss.castShadow = true;
         boomGroup.add(boomTruss);
 
         const backReach = new THREE.Mesh(new THREE.BoxGeometry(VECTOR.backReach, 3.5, 6), createMaterial(COLOR.gantry));
-        backReach.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight + 10, 6);
+        backReach.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight + 10, 0);
         backReach.castShadow = true;
         boomGroup.add(backReach);
 
         const counterWeight = new THREE.Mesh(new THREE.BoxGeometry(18, 12, 12), createMaterial(COLOR.structureDark));
-        counterWeight.position.set(-VECTOR.backReach - 10, VECTOR.towerHeight + 6, 6);
+        counterWeight.position.set(-VECTOR.backReach - 10, VECTOR.towerHeight + 6, 0);
         counterWeight.castShadow = true;
         boomGroup.add(counterWeight);
 
         const supportCable = createCable(
-            new THREE.Vector3(-VECTOR.backReach * 0.4, VECTOR.towerHeight + 18, 6),
-            new THREE.Vector3(VECTOR.boomOutreach, VECTOR.towerHeight + 16, -6),
+            new THREE.Vector3(-VECTOR.backReach * 0.4, VECTOR.towerHeight + 18, 0),
+            new THREE.Vector3(VECTOR.boomOutreach, VECTOR.towerHeight + 16, 0),
             0.22
         );
         boomGroup.add(supportCable);
 
         boomGroup.add(
             createCable(
-                new THREE.Vector3(0, VECTOR.towerHeight + 14, 2),
-                new THREE.Vector3(VECTOR.boomOutreach * 0.62, VECTOR.towerHeight + 14, -6),
+                new THREE.Vector3(0, VECTOR.towerHeight + 14, 0),
+                new THREE.Vector3(VECTOR.boomOutreach * 0.62, VECTOR.towerHeight + 14, 0),
                 0.18
             )
         );
