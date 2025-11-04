@@ -219,31 +219,31 @@ const state = {
     platform: 0.2
 };
 
-const modeController = gui.add(state, 'mode', { 自动: 'auto', 手动: 'manual' }).name('运行模式');
-const manualFolder = gui.addFolder('手动控制');
+const modeController = gui.add(state, 'mode', { Auto: 'auto', Manual: 'manual' }).name('Operation Mode');
+const manualFolder = gui.addFolder('Manual Control');
 manualFolder
     .add(state, 'gantry', 0, 1, 0.001)
-    .name('Gantry 位置')
+    .name('Gantry Position')
     .onChange(() => state.mode === 'manual' && applyManualState());
 manualFolder
     .add(state, 'primaryTravel', 0, 1, 0.001)
-    .name('Primary 小车')
+    .name('Primary Trolley')
     .onChange(() => state.mode === 'manual' && applyManualState());
 manualFolder
     .add(state, 'primaryHoist', 0, 1, 0.001)
-    .name('Primary 吊具')
+    .name('Primary Spreader')
     .onChange(() => state.mode === 'manual' && applyManualState());
 manualFolder
     .add(state, 'secondaryTravel', 0, 1, 0.001)
-    .name('Secondary 小车')
+    .name('Secondary Trolley')
     .onChange(() => state.mode === 'manual' && applyManualState());
 manualFolder
     .add(state, 'secondaryHoist', 0, 1, 0.001)
-    .name('Secondary 吊具')
+    .name('Secondary Spreader')
     .onChange(() => state.mode === 'manual' && applyManualState());
 manualFolder
     .add(state, 'platform', 0, 1, 0.001)
-    .name('交接平台')
+    .name('Handover Platform')
     .onChange(() => state.mode === 'manual' && applyManualState());
 
 manualFolder.close();
@@ -273,7 +273,7 @@ updateModeBadge(state.mode);
 
 function applyManualState() {
     crane.applyManualState(state);
-    stageLabel.textContent = '手动控制模式';
+    stageLabel.textContent = 'Manual Control Mode';
 }
 
 const clock = new THREE.Clock();

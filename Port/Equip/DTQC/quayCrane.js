@@ -573,12 +573,12 @@ export class DualTrolleyQuayCrane extends THREE.Group {
 
     runAutoCycle(phase, delta) {
         const stages = [
-            '主小车抓取舱内集装箱',
-            '主小车将箱子放至交接平台',
-            '副小车取箱并送至AGV',
-            'AGV撤离，副小车返回平台',
-            '主小车返回船舶舱内',
-            '系统待机'
+            'Primary trolley picks up container from ship hold',
+            'Primary trolley places container on handover platform',
+            'Secondary trolley takes container and delivers to AGV',
+            'AGV departs, secondary trolley returns to platform',
+            'Primary trolley returns to ship hold',
+            'System standby'
         ];
 
         let stageIndex = 0;
