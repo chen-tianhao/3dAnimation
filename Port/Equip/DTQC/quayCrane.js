@@ -423,6 +423,36 @@ export class DualTrolleyQuayCrane extends THREE.Group {
         this.secondaryAssembly.position.set(-VECTOR.backReach * 0.6, secondaryBaselineY, 0);  // Centered in Z direction
         gantry.add(this.secondaryAssembly);
 
+        // Track support for secondary trolley
+        const supportGroup = new THREE.Group();
+        supportGroup.name = 'secondaryTrackSupport';
+
+        // Horizontal beams on both sides
+        const horizontalBeamGeo = new THREE.BoxGeometry(60, 4, 2);
+        const horizontalBeamMat = createMaterial(COLOR.gantry, { metalness: 0.4, roughness: 0.45 });
+        const horizontalBeam1 = new THREE.Mesh(horizontalBeamGeo, horizontalBeamMat);
+        horizontalBeam1.position.set(-VECTOR.backReach + 10, secondaryBaselineY, -halfBase);
+        horizontalBeam1.castShadow = true;
+        horizontalBeam1.receiveShadow = true;
+        supportGroup.add(horizontalBeam1);
+
+        const horizontalBeam2 = horizontalBeam1.clone();
+        horizontalBeam2.position.z = halfBase;
+        supportGroup.add(horizontalBeam2);
+
+        // Vertical end beams
+        const verticalBeamGeo1 = new THREE.BoxGeometry(2, 2, halfBase * 2);
+        const verticalBeam1 = new THREE.Mesh(verticalBeamGeo1, horizontalBeamMat);
+        verticalBeam1.position.set(-VECTOR.backReach - 20, secondaryBaselineY, 0);
+        verticalBeam1.castShadow = true;
+        verticalBeam1.receiveShadow = true;
+        supportGroup.add(verticalBeam1);
+
+        // Add edge lines for detailing
+        [horizontalBeam1, horizontalBeam2, verticalBeam1].forEach(mesh => createEdgeLines(mesh, 0x111827, 1));
+
+        gantry.add(supportGroup);
+
         // Handover platform
         this.platformGroup = new THREE.Group();
         this.platformGroup.name = 'handoverPlatform';
