@@ -192,9 +192,9 @@ function createSpreader(name, color = COLOR.platform) {
         }
     }
 
-    const lightBar = createLightingBar(9, 4);
-    lightBar.position.set(0, -0.4, 1.6);
-    spreader.add(lightBar);
+    // const lightBar = createLightingBar(9, 4);
+    // lightBar.position.set(0, -0.4, 1.6);
+    // spreader.add(lightBar);
 
     // spreader.rotation.y = Math.PI / 2;  // Rotate spreader to be parallel to coastline
 
