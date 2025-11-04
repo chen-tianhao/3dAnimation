@@ -268,8 +268,7 @@ export class DualTrolleyQuayCrane extends THREE.Group {
             primaryTravel: 0,
             primaryHoist: 0,
             secondaryTravel: 0,
-            secondaryHoist: 0,
-            platform: 0
+            secondaryHoist: 0
         };
 
         this._buildStructure();
@@ -444,28 +443,29 @@ export class DualTrolleyQuayCrane extends THREE.Group {
             new THREE.BoxGeometry(18, 2, 10),
             createMaterial(COLOR.platform, { roughness: 0.4, metalness: 0.5 })
         );
-        platformBase.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight + 8, halfBase - 2);
+        platformBase.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight * 0.2, 0);
         platformBase.castShadow = true;
         platformBase.receiveShadow = true;
         this.platformGroup.add(platformBase);
 
         const rollers = new THREE.Mesh(
             new THREE.CylinderGeometry(0.5, 0.5, 16, 24),
-            createMaterial(COLOR.steel, { roughness: 0.3 })
+            createMaterial(0xff0000, { roughness: 0.3 })
         );
         rollers.rotation.z = Math.PI / 2;
-        rollers.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight + 9.6, halfBase - 0.5);
+        rollers.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight * 0.2 + 0.6, 0);
         rollers.castShadow = true;
         this.platformGroup.add(rollers);
 
         const buffer = new THREE.Mesh(new THREE.BoxGeometry(18, 1.5, 1.2), createMaterial(0x1e3a8a, { emissive: 0x1e40af, emissiveIntensity: 0.5 }));
-        buffer.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight + 9.2, halfBase + 3);
+        buffer.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight * 0.2 + 0.2, 0);
         buffer.castShadow = true;
         this.platformGroup.add(buffer);
 
-        const agvGuide = new THREE.Mesh(new THREE.BoxGeometry(24, 1, 0.8), createMaterial(0x38bdf8, { emissive: 0x0ea5e9, emissiveIntensity: 0.6 }));
-        agvGuide.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight + 3.8, halfBase + 6);
-        this.platformGroup.add(agvGuide);
+        // const agvGuide = new THREE.Mesh(new THREE.BoxGeometry(24, 1, 0.8), createMaterial(0x800080, { emissive: 0x0ea5e9, emissiveIntensity: 0.6 }));
+        // agvGuide.position.set(-VECTOR.backReach / 2, VECTOR.towerHeight * 0.2 - 1, halfBase + 6);  // Adjusted Y position to make it more visible near the platform
+        // agvGuide.castShadow = true;
+        // this.platformGroup.add(agvGuide);
 
         gantry.add(this.platformGroup);
 
@@ -485,14 +485,13 @@ export class DualTrolleyQuayCrane extends THREE.Group {
         this.gantryGroup = gantry;
     }
 
-    applyManualState({ gantry, primaryTravel, primaryHoist, secondaryTravel, secondaryHoist, platform }) {
+    applyManualState({ gantry, primaryTravel, primaryHoist, secondaryTravel, secondaryHoist }) {
         this.state = {
             gantry: clamp01(gantry),
             primaryTravel: clamp01(primaryTravel),
             primaryHoist: clamp01(primaryHoist),
             secondaryTravel: clamp01(secondaryTravel),
-            secondaryHoist: clamp01(secondaryHoist),
-            platform: clamp01(platform)
+            secondaryHoist: clamp01(secondaryHoist)
         };
         this._updateTransforms();
     }
@@ -503,8 +502,7 @@ export class DualTrolleyQuayCrane extends THREE.Group {
             primaryTravel,
             primaryHoist,
             secondaryTravel,
-            secondaryHoist,
-            platform
+            secondaryHoist
         } = this.state;
 
         const gantryOffset = THREE.MathUtils.lerp(-60, 60, gantry);
@@ -561,14 +559,6 @@ export class DualTrolleyQuayCrane extends THREE.Group {
             secondaryData.trolley.add(cable);
             secondaryData.cables.push(cable);
         });
-
-        const platformTilt = THREE.MathUtils.degToRad(THREE.MathUtils.lerp(-6, 6, platform));
-        this.platformGroup.rotation.y = platformTilt * 0.2;
-        this.platformGroup.children.forEach((child, index) => {
-            if (index === 1) {
-                child.rotation.x = platformTilt * 1.6;
-            }
-        });
     }
 
     runAutoCycle(phase, delta) {
@@ -588,7 +578,6 @@ export class DualTrolleyQuayCrane extends THREE.Group {
         this.state.primaryHoist = 0.2;
         this.state.secondaryTravel = 0.85;
         this.state.secondaryHoist = 0.2;
-        this.state.platform = 0.22;
 
         if (phase < 0.18) {
             stageIndex = 0;
@@ -602,26 +591,22 @@ export class DualTrolleyQuayCrane extends THREE.Group {
             const t = easeInOut((phase - 0.18) / 0.18);
             this.state.primaryTravel = 1 - t;
             this.state.primaryHoist = Math.min(0.2 + t * 0.8, 1);
-            this.state.platform = 0.3 + t * 0.15;
         } else if (phase < 0.56) {
             stageIndex = 2;
             const t = easeInOut((phase - 0.36) / 0.2);
             this.state.primaryTravel = 0.05;
             this.state.secondaryTravel = 1 - t;
             this.state.secondaryHoist = t;
-            this.state.platform = 0.45 + t * 0.12;
         } else if (phase < 0.76) {
             stageIndex = 3;
             const t = easeInOut((phase - 0.56) / 0.2);
             this.state.secondaryTravel = t;
             this.state.secondaryHoist = 1 - t * 0.85;
-            this.state.platform = 0.52 - t * 0.2;
         } else if (phase < 0.92) {
             stageIndex = 4;
             const t = easeInOut((phase - 0.76) / 0.16);
             this.state.primaryTravel = t * 0.95;
             this.state.primaryHoist = 0.3 + t * 0.6;
-            this.state.platform = 0.22;
         } else {
             stageIndex = 5;
             const idlePhase = (phase - 0.92) / 0.08;
@@ -629,14 +614,12 @@ export class DualTrolleyQuayCrane extends THREE.Group {
             this.state.primaryHoist = 0.18;
             this.state.secondaryTravel = 0.7 + 0.1 * Math.sin(idlePhase * Math.PI * 2);
             this.state.secondaryHoist = 0.18 + 0.08 * Math.sin(idlePhase * Math.PI * 3);
-            this.state.platform = 0.24;
         }
 
         this.state.secondaryTravel = clamp01(this.state.secondaryTravel);
         this.state.secondaryHoist = clamp01(this.state.secondaryHoist);
         this.state.primaryTravel = clamp01(this.state.primaryTravel);
         this.state.primaryHoist = clamp01(this.state.primaryHoist);
-        this.state.platform = clamp01(this.state.platform);
 
         this.state.gantry = clamp01(0.45 + 0.05 * Math.sin(phase * Math.PI * 2));
         this._updateTransforms();

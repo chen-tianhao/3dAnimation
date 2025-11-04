@@ -215,8 +215,7 @@ const state = {
     primaryTravel: 0.18,
     primaryHoist: 0.32,
     secondaryTravel: 0.56,
-    secondaryHoist: 0.45,
-    platform: 0.2
+    secondaryHoist: 0.45
 };
 
 const modeController = gui.add(state, 'mode', { Auto: 'auto', Manual: 'manual' }).name('Operation Mode');
@@ -240,10 +239,6 @@ manualFolder
 manualFolder
     .add(state, 'secondaryHoist', 0, 1, 0.001)
     .name('Secondary Spreader')
-    .onChange(() => state.mode === 'manual' && applyManualState());
-manualFolder
-    .add(state, 'platform', 0, 1, 0.001)
-    .name('Handover Platform')
     .onChange(() => state.mode === 'manual' && applyManualState());
 
 manualFolder.close();
