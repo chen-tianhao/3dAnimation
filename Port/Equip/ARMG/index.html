@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SANY ARMG 3D Visualization</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <header>
+    <h1>SANY RMG5540S Automated Rail-Mounted Gantry</h1>
+    <p>
+      Hoisting capacity 41&nbsp;t · Rail span 40&nbsp;m · Hoisting height 18.2&nbsp;m
+    </p>
+  </header>
+  <main>
+    <section class="scene-container">
+      <div id="scene"></div>
+      <aside class="legend">
+        <h2>Operation Cycle</h2>
+        <ol>
+          <li>Crane traverses to the waiting AGV.</li>
+          <li>Spreader lowers, clamps the container, then hoists.</li>
+          <li>Trolley shifts to the yard block.</li>
+          <li>Container is centered over the stack and lowered.</li>
+          <li>Spreader releases, rises, and returns to standby.</li>
+        </ol>
+        <p>
+          Use the mouse to orbit, pan, and zoom the view. Press <kbd>R</kbd> to
+          restart the animation.
+        </p>
+      </aside>
+    </section>
+  </main>
+  <footer>
+    <small>
+      Reference data sourced from the
+      <a href="https://www.sanyglobal.com/product/port_machinery/customized_container_cranes/73/444" target="_blank" rel="noopener noreferrer">
+        SANY ARMG product page
+      </a>.
+    </small>
+  </footer>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
