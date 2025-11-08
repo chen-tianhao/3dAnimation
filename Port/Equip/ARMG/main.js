@@ -413,7 +413,6 @@ const animationStates = [
       }
       hoistedContainer = null;
       pickNextSlot();
-      aaa=1;
     },
   },
   {
@@ -440,6 +439,9 @@ const resetSimulation = () => {
   stateIndex = 0;
   stateElapsed = 0;
   hoistedContainer = null;
+
+  // Reset crane gantry position to initial
+  crane.group.position.x = 10.8;
 
   dynamicContainers.forEach((container) => {
     container.parent?.remove(container);
@@ -502,11 +504,11 @@ modeController.onChange((value) => {
   if (value === 'manual') {
     applyManualState();
   } else {
-    // Reset to auto mode - restore crane to current animation state
-    const resetTarget = slots[targetSlotIndex];
-    const resetTrolleyLocalX = computeSlotTargetLocalX(resetTarget, resetTarget.stackHeight);
-    crane.setTrolleyPosition(resetTrolleyLocalX);
-    crane.setHoistDepth(travelClearanceDepth);
+    // Reset to auto mode - reinitialize all component positions and GUI state
+    guiState.gantry = 0.5; // Reset to center position
+    guiState.trolley = 0.5; // Reset to center position  
+    guiState.hoist = 0.2; // Reset to raised position
+    resetSimulation();
   }
 });
 
