@@ -90,6 +90,34 @@ water.rotation.x = -Math.PI / 2;
 water.position.set(-70, -0.04, -120);
 scene.add(water);
 
+const createAxes = (length) => {
+  const group = new THREE.Group();
+
+  // X轴 - 红色
+  const xGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(length, 0, 0)]);
+  const xMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  const xLine = new THREE.Line(xGeometry, xMaterial);
+  group.add(xLine);
+
+  // Y轴 - 黄色
+  const yGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, length, 0)]);
+  const yMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 });
+  const yLine = new THREE.Line(yGeometry, yMaterial);
+  group.add(yLine);
+
+  // Z轴 - 蓝色
+  const zGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, length)]);
+  const zMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+  const zLine = new THREE.Line(zGeometry, zMaterial);
+  group.add(zLine);
+
+  return group;
+};
+
+const axes = createAxes(5);
+axes.position.set(-40, 0.1, 40);
+scene.add(axes);
+
 const guideRailMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.36, roughness: 0.4 });
 const railLength = 220;
 const railWidth = 0.6;
@@ -114,7 +142,7 @@ function buildVesselSilhouette() {
         new THREE.BoxGeometry(90, 12, 32),
         new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.5, roughness: 0.35 })
     );
-    hull.position.set(-54, 6, -88);
+    hull.position.set(-24, 6, -76);
     hull.castShadow = true;
     hull.receiveShadow = true;
 
@@ -122,22 +150,10 @@ function buildVesselSilhouette() {
         new THREE.BoxGeometry(90, 0.6, 32),
         new THREE.MeshStandardMaterial({ color: 0x1e3a8a, roughness: 0.55, metalness: 0.25 })
     );
-    deck.position.set(-54, 12.3, -88);
-
-    const bridge = new THREE.Mesh(
-        new THREE.BoxGeometry(18, 16, 14),
-        new THREE.MeshStandardMaterial({ color: 0xf8fafc, emissive: 0x1e40af, emissiveIntensity: 0.4, roughness: 0.28 })
-    );
-    bridge.position.set(-18, 18, -110);
-
-    const stack = new THREE.Mesh(
-        new THREE.CylinderGeometry(4.2, 4.2, 14, 24),
-        new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.6, roughness: 0.3 })
-    );
-    stack.position.set(-30, 19, -110);
+    deck.position.set(-24, 12.3, -76);
 
     const vessel = new THREE.Group();
-    vessel.add(hull, deck, bridge, stack);
+    vessel.add(hull, deck);
     return vessel;
 }
 
@@ -200,7 +216,7 @@ const containerMat = new THREE.MeshStandardMaterial({ color: 0xf97316, metalness
 for (let x = -3; x <= 3; x++) {
     for (let y = 0; y < 2; y++) {
         const cont = new THREE.Mesh(containerGeo, containerMat);
-        cont.position.set(-62 + x * 6.4, 13 + y * 3, -96);
+        cont.position.set(-12 + x * 6.4, 13 + y * 3, -84);
         cont.castShadow = true;
         cont.receiveShadow = true;
         scene.add(cont);
