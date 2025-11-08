@@ -86,18 +86,6 @@ const axes = createAxes(5);
 axes.position.set(-20, 0.1, -20);
 scene.add(axes);
 
-const yardMarkingMaterial = new THREE.LineBasicMaterial({ color: 0x2d3748, linewidth: 1 });
-const markingGeometry = new THREE.BufferGeometry();
-markingGeometry.setFromPoints([
-  new THREE.Vector3(-20, 0.002, -20),
-  new THREE.Vector3(40, 0.002, -20),
-  new THREE.Vector3(40, 0.002, 20),
-  new THREE.Vector3(-20, 0.002, 20),
-  new THREE.Vector3(-20, 0.002, -20),
-]);
-const markings = new THREE.Line(markingGeometry, yardMarkingMaterial);
-scene.add(markings);
-
 const crane = new ARMGCrane({ railSpan: 40, hoistHeight: 18.2, cantilever: 7.5, trolleyWidth: 6 });
 crane.group.rotation.y = Math.PI / 2;
 crane.group.position.set(10.8, 0, 4);
