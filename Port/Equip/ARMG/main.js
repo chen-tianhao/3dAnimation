@@ -2,7 +2,8 @@ import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js?module";
 import { ARMGCrane } from "./armg.js";
 
-const containerSize = { length: 12.2, height: 2.6, width: 2.5 };
+const containerSize = { length: 6.1, height: 2.59, width: 2.44 };
+const containerGap = 0.25;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0c1018);
 scene.fog = new THREE.Fog(0x0c1018, 80, 180);
@@ -70,6 +71,8 @@ const markings = new THREE.Line(markingGeometry, yardMarkingMaterial);
 scene.add(markings);
 
 const crane = new ARMGCrane({ railSpan: 40, hoistHeight: 18.2, cantilever: 7.5, trolleyWidth: 6 });
+crane.group.rotation.y = Math.PI / 2;
+crane.group.position.set(14, 0, 4);
 scene.add(crane.group);
 
 const createContainer = (color = 0x3366cc) => {
@@ -125,22 +128,30 @@ scene.add(agv.group);
 const createYardBlock = () => {
   const yardGroup = new THREE.Group();
   const padHeight = 0.4;
-  const pad = new THREE.Mesh(new THREE.BoxGeometry(18, padHeight, 14), new THREE.MeshStandardMaterial({ color: 0x202838, metalness: 0.1, roughness: 0.9 }));
+  const pad = new THREE.Mesh(new THREE.BoxGeometry(38, padHeight, 27), new THREE.MeshStandardMaterial({ color: 0x202838, metalness: 0.1, roughness: 0.9 }));
   pad.position.y = padHeight / 2;
   pad.receiveShadow = true;
   yardGroup.add(pad);
 
-  const rows = 2;
-  const cols = 3;
-  const slotSpacingX = 5.6;
-  const slotSpacingZ = 4.6;
+  const rows = 10;
+  const cols = 6;
+  const slotSpacingX = containerSize.length + containerGap; // 6.1 + 0.25 = 6.35
+  const slotSpacingZ = containerSize.width + containerGap; // 2.44 + 0.25 = 2.69
   const originX = -((cols - 1) * slotSpacingX) / 2;
   const originZ = -((rows - 1) * slotSpacingZ) / 2;
 
   const slots = [];
   const initialLayout = [
-    [2, 2, 1],
-    [1, 0, 1],
+    [1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1],
+    [2, 1, 1, 2, 1, 1],
+    [1, 1, 2, 1, 1, 2],
+    [2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2],
+    [2, 2, 2, 2, 2, 2],
+    [3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3],
+    [3, 3, 3, 3, 3, 3],
   ];
 
   for (let row = 0; row < rows; row += 1) {
@@ -158,7 +169,7 @@ const createYardBlock = () => {
       const initialCount = initialLayout[row][col];
       for (let level = 0; level < initialCount; level += 1) {
         const container = createContainer(randomContainerColor());
-        container.position.set(localX, slot.stackBaseY + level * containerSize.height, localZ);
+        container.position.set(localX, slot.stackBaseY + level * (containerSize.height + containerGap), localZ);
         container.userData.originSlot = slot;
         slot.containers.push(container);
         yardGroup.add(container);
@@ -250,7 +261,7 @@ const computeSlotLocalPosition = (slot, stackHeight) => {
   const { localPosition, stackBaseY } = slot;
   return new THREE.Vector3(
     localPosition.x,
-    stackBaseY + stackHeight * containerSize.height,
+    stackBaseY + stackHeight * (containerSize.height + containerGap),
     localPosition.z,
   );
 };
@@ -272,8 +283,8 @@ const animationStates = [
       approachStartX = crane.trolleyGroup.position.x;
     },
     onUpdate: (t) => {
-      const targetX = agv.group.position.x;
-      const value = THREE.MathUtils.lerp(approachStartX, targetX, t);
+      const targetLocalX = agv.group.position.z - crane.group.position.z;
+      const value = THREE.MathUtils.lerp(approachStartX, targetLocalX, t);
       crane.setTrolleyPosition(value);
     },
   },
@@ -317,8 +328,9 @@ const animationStates = [
     },
     onUpdate: (t) => {
       const slot = slots[targetSlotIndex];
-  const targetPos = computeSlotWorldPosition(slot, slot.stackHeight);
-      const value = THREE.MathUtils.lerp(traverseStartX, targetPos.x, t);
+      const targetPos = computeSlotWorldPosition(slot, slot.stackHeight);
+      const targetLocalX = targetPos.z - crane.group.position.z;
+      const value = THREE.MathUtils.lerp(traverseStartX, targetLocalX, t);
       crane.setTrolleyPosition(value);
     },
   },
@@ -373,8 +385,8 @@ const animationStates = [
       returnStartX = crane.trolleyGroup.position.x;
     },
     onUpdate: (t) => {
-      const targetX = -6;
-      const value = THREE.MathUtils.lerp(returnStartX, targetX, t);
+      const targetLocalX = -6;
+      const value = THREE.MathUtils.lerp(returnStartX, targetLocalX, t);
       crane.setTrolleyPosition(value);
     },
   },

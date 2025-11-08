@@ -30,33 +30,46 @@ export class ARMGCrane {
   }
 
   _buildStructure() {
-    const verticalLegGeometry = new THREE.BoxGeometry(1.6, this.crossbeamElevation, 2.4);
+    const frameThickness = 1.5;
     const legMaterial = new THREE.MeshStandardMaterial({ color: FRAME_COLOR, metalness: 0.35, roughness: 0.6 });
 
-    const leftLeg = new THREE.Mesh(verticalLegGeometry, legMaterial);
-    leftLeg.position.set(-this.halfSpan, this.crossbeamElevation / 2, -1.5);
+    // Left leg as door frame
+    const leftFrame = new THREE.Group();
+    const leftVertical = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, this.crossbeamElevation, frameThickness), legMaterial);
+    leftVertical.position.set(0, this.crossbeamElevation / 2, -6.5);
+    const leftRightVertical = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, this.crossbeamElevation, frameThickness), legMaterial);
+    leftRightVertical.position.set(0, this.crossbeamElevation / 2, 6.5);
+    const leftTopHorizontal = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, frameThickness, 13), legMaterial);
+    leftTopHorizontal.position.set(0, this.crossbeamElevation - frameThickness / 2, 0);
+    leftFrame.add(leftVertical, leftRightVertical, leftTopHorizontal);
+    leftFrame.position.set(-this.halfSpan, 0, 0);
+    leftFrame.castShadow = leftFrame.receiveShadow = true;
 
-    const rightLeg = new THREE.Mesh(verticalLegGeometry, legMaterial);
-    rightLeg.position.set(this.halfSpan, this.crossbeamElevation / 2, 1.5);
+    // Right leg as door frame
+    const rightFrame = new THREE.Group();
+    const rightVertical = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, this.crossbeamElevation, frameThickness), legMaterial);
+    rightVertical.position.set(0, this.crossbeamElevation / 2, -6.5);
+    const rightRightVertical = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, this.crossbeamElevation, frameThickness), legMaterial);
+    rightRightVertical.position.set(0, this.crossbeamElevation / 2, 6.5);
+    const rightTopHorizontal = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, frameThickness, 13), legMaterial);
+    rightTopHorizontal.position.set(7, this.crossbeamElevation, 0);
+    rightFrame.add(rightVertical, rightRightVertical, rightTopHorizontal);
+    rightFrame.position.set(this.halfSpan, 0, 0);
+    rightFrame.castShadow = rightFrame.receiveShadow = true;
 
-    leftLeg.castShadow = rightLeg.castShadow = true;
-    leftLeg.receiveShadow = rightLeg.receiveShadow = true;
-
-    this.group.add(leftLeg, rightLeg);
-
-    // lower girders connecting the legs
-    const lowerGirderGeometry = new THREE.BoxGeometry(this.railSpan, 1.2, 1.2);
-    const lowerGirder = new THREE.Mesh(lowerGirderGeometry, legMaterial);
-    lowerGirder.position.set(0, 0.6, 0);
-    lowerGirder.castShadow = lowerGirder.receiveShadow = true;
-    this.group.add(lowerGirder);
+    this.group.add(leftFrame, rightFrame);
 
     // upper cross beam with slight cantilever
-    const crossBeamGeometry = new THREE.BoxGeometry(this.railSpan + this.cantilever, 1.2, 2.2);
-    const crossBeam = new THREE.Mesh(crossBeamGeometry, legMaterial);
-    crossBeam.position.set(this.cantilever / 2, this.crossbeamElevation, 0);
-    crossBeam.castShadow = crossBeam.receiveShadow = true;
-    this.group.add(crossBeam);
+    const crossBeamGeometry = new THREE.BoxGeometry(this.railSpan + this.cantilever, frameThickness, frameThickness);
+    const crossBeam1 = new THREE.Mesh(crossBeamGeometry, legMaterial);
+    crossBeam1.position.set(this.cantilever / 2, this.crossbeamElevation, -6.5);
+    crossBeam1.castShadow = crossBeam1.receiveShadow = true;
+    this.group.add(crossBeam1);
+
+    const crossBeam2 = new THREE.Mesh(crossBeamGeometry, legMaterial);
+    crossBeam2.position.set(this.cantilever / 2, this.crossbeamElevation, 6.5);
+    crossBeam2.castShadow = crossBeam2.receiveShadow = true;
+    this.group.add(crossBeam2);
 
     // walkway on top of cross beam
     const walkwayGeometry = new THREE.BoxGeometry(this.railSpan + this.cantilever, 0.2, 3.2);
@@ -123,6 +136,7 @@ export class ARMGCrane {
     this.spreaderGroup = new THREE.Group();
     this.spreaderGroup.add(this.spreader);
     this.spreaderGroup.position.set(0, -1.5, 0);
+    this.spreaderGroup.rotation.y = Math.PI / 2;
 
   this.hoistGroup.add(this.spreaderGroup);
   this.trolleyGroup.add(this.hoistGroup);
