@@ -240,21 +240,25 @@ pickNextSlot();
 const spreaderBottomOffset = crane.spreaderBottomOffset ?? 1.75;
 const depthForSpreaderBottom = (worldY) => Math.max(0, crane.crossbeamElevation - worldY - spreaderBottomOffset);
 
-const raisedClearance = depthForSpreaderBottom(16);
+const travelClearanceDepth = depthForSpreaderBottom(16);
+const hoistTopDepth = 0;
+
 const agvContainerTop = agv.chassisHeight + containerSize.height;
 const agvPickupDepth = depthForSpreaderBottom(agvContainerTop + 0.1);
+
+const containerHoistOffset = (crane.crossbeamElevation - crane.trolleyGroup.position.y) + Math.abs(crane.spreaderGroup.position.y) + (containerSize.height / 2 + 0.25);
+const depthForContainerCenter = (worldY) => Math.max(0, crane.crossbeamElevation - worldY - containerHoistOffset);
 
 let activeContainer = null;
 let hoistedContainer = null;
 const dynamicContainers = [];
 
-let approachStartX = -6;
-let lowerStartDepth = raisedClearance;
-let hoistStartDepth = raisedClearance;
-let traverseStartX = -6;
-let stackLowerStartDepth = raisedClearance;
-let raiseStartDepth = raisedClearance;
-let returnStartX = -6;
+let approachStartX = 0;
+let lowerStartDepth = travelClearanceDepth;
+let hoistStartDepth = travelClearanceDepth;
+let traverseStartX = 0;
+let stackLowerStartDepth = travelClearanceDepth;
+let raiseStartDepth = travelClearanceDepth;
 
 const spawnContainerOnAgv = () => {
   if (activeContainer) return;
@@ -264,10 +268,6 @@ const spawnContainerOnAgv = () => {
   activeContainer = container;
   dynamicContainers.push(container);
 };
-
-spawnContainerOnAgv();
-crane.setTrolleyPosition(-6);
-crane.setHoistDepth(raisedClearance);
 
 const clock = new THREE.Clock();
 let stateIndex = 0;
@@ -291,6 +291,29 @@ const computeSlotWorldPosition = (slot, stackHeight) => {
   );
 };
 
+const computeTrolleyLocalXFromWorld = (worldPosition) => {
+  crane.group.updateMatrixWorld(true);
+  const local = worldPosition.clone();
+  crane.group.worldToLocal(local);
+  return local.x;
+};
+
+const computeSlotTargetLocalX = (slot, stackHeight) => computeTrolleyLocalXFromWorld(computeSlotWorldPosition(slot, stackHeight));
+
+const getAgvReferenceWorldPosition = () => {
+  agv.group.updateMatrixWorld(true);
+  return agv.group.localToWorld(new THREE.Vector3(0, 0, 0));
+};
+
+const agvPickupLocalX = computeTrolleyLocalXFromWorld(getAgvReferenceWorldPosition());
+
+const initialStackWorldPosition = computeSlotWorldPosition(slots[targetSlotIndex], slots[targetSlotIndex].stackHeight);
+const initialTrolleyLocalX = computeTrolleyLocalXFromWorld(initialStackWorldPosition);
+
+crane.setTrolleyPosition(initialTrolleyLocalX);
+crane.setHoistDepth(travelClearanceDepth);
+spawnContainerOnAgv();
+
 const animationStates = [
   {
     name: "approach-agv",
@@ -299,8 +322,7 @@ const animationStates = [
       approachStartX = crane.trolleyGroup.position.x;
     },
     onUpdate: (t) => {
-      const targetLocalX = agv.group.position.z - crane.group.position.z;
-      const value = THREE.MathUtils.lerp(approachStartX, targetLocalX, t);
+      const value = THREE.MathUtils.lerp(approachStartX, agvPickupLocalX, t);
       crane.setTrolleyPosition(value);
     },
   },
@@ -332,7 +354,7 @@ const animationStates = [
       hoistStartDepth = crane.hoistGroup.position.y * -1;
     },
     onUpdate: (t) => {
-      const depth = THREE.MathUtils.lerp(hoistStartDepth, raisedClearance, t);
+      const depth = THREE.MathUtils.lerp(hoistStartDepth, hoistTopDepth, t);
       crane.setHoistDepth(depth);
     },
   },
@@ -344,8 +366,7 @@ const animationStates = [
     },
     onUpdate: (t) => {
       const slot = slots[targetSlotIndex];
-      const targetPos = computeSlotWorldPosition(slot, slot.stackHeight);
-      const targetLocalX = targetPos.z - crane.group.position.z;
+      const targetLocalX = computeSlotTargetLocalX(slot, slot.stackHeight);
       const value = THREE.MathUtils.lerp(traverseStartX, targetLocalX, t);
       crane.setTrolleyPosition(value);
     },
@@ -359,8 +380,7 @@ const animationStates = [
     onUpdate: (t) => {
       const slot = slots[targetSlotIndex];
       const targetPos = computeSlotWorldPosition(slot, slot.stackHeight);
-      const containerTop = targetPos.y + containerSize.height / 2;
-      const targetDepth = depthForSpreaderBottom(containerTop + 0.05);
+      const targetDepth = depthForContainerCenter(targetPos.y);
       const depth = THREE.MathUtils.lerp(stackLowerStartDepth, targetDepth, t);
       crane.setHoistDepth(depth);
     },
@@ -371,7 +391,7 @@ const animationStates = [
     onStart: () => {
       if (!hoistedContainer) return;
       const slot = slots[targetSlotIndex];
-  const dropLocal = computeSlotLocalPosition(slot, slot.stackHeight);
+      const dropLocal = computeSlotLocalPosition(slot, slot.stackHeight);
       const released = crane.detachContainer(yard.group, dropLocal);
       if (released) {
         released.position.copy(dropLocal);
@@ -390,20 +410,8 @@ const animationStates = [
       raiseStartDepth = crane.hoistGroup.position.y * -1;
     },
     onUpdate: (t) => {
-      const depth = THREE.MathUtils.lerp(raiseStartDepth, raisedClearance, t);
+      const depth = THREE.MathUtils.lerp(raiseStartDepth, travelClearanceDepth, t);
       crane.setHoistDepth(depth);
-    },
-  },
-  {
-    name: "return-home",
-    duration: 3.2,
-    onStart: () => {
-      returnStartX = crane.trolleyGroup.position.x;
-    },
-    onUpdate: (t) => {
-      const targetLocalX = -6;
-      const value = THREE.MathUtils.lerp(returnStartX, targetLocalX, t);
-      crane.setTrolleyPosition(value);
     },
   },
   {
@@ -420,8 +428,6 @@ animationStates[stateIndex].onStart?.();
 const resetSimulation = () => {
   stateIndex = 0;
   stateElapsed = 0;
-  crane.setTrolleyPosition(-6);
-  crane.setHoistDepth(raisedClearance);
   hoistedContainer = null;
 
   dynamicContainers.forEach((container) => {
@@ -439,8 +445,12 @@ const resetSimulation = () => {
     slot.stackHeight = slot.initialCount;
   });
   activeContainer = null;
-  spawnContainerOnAgv();
   pickNextSlot();
+  const resetTarget = slots[targetSlotIndex];
+  const resetTrolleyLocalX = computeSlotTargetLocalX(resetTarget, resetTarget.stackHeight);
+  crane.setTrolleyPosition(resetTrolleyLocalX);
+  crane.setHoistDepth(travelClearanceDepth);
+  spawnContainerOnAgv();
   animationStates[stateIndex].onStart?.();
 };
 

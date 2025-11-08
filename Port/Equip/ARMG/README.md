@@ -1,6 +1,6 @@
 # SANY ARMG 3D Demonstrator
 
-This directory hosts a lightweight Three.js scene that visualizes the automated workflow of the SANY RMG5540S automated rail-mounted gantry crane (ARMG). The visualization references key parameters published on the [official SANY product page](https://www.sanyglobal.com/product/port_machinery/customized_container_cranes/73/444).
+This directory hosts a lightweight Three.js scene that visualizes the automated workflow of the automated rail-mounted gantry crane (ARMG). The visualization references key parameters published on the [official SANY product page](https://www.sanyglobal.com/product/port_machinery/customized_container_cranes/73/444).
 
 ## Features
 
