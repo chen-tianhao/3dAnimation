@@ -165,24 +165,24 @@ function buildAGVBay() {
 
     const bayMat = new THREE.MeshStandardMaterial({ color: 0x111827, metalness: 0.2, roughness: 0.8 });
     const bay = new THREE.Mesh(new THREE.BoxGeometry(28, 0.4, 20), bayMat);
-    bay.position.set(0, 0.3, 16);
+    bay.position.set(0, 0.3, 30);
     bay.receiveShadow = true;
     group.add(bay);
 
     const stopMarkMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0ea5e9, emissiveIntensity: 0.7, roughness: 0.4 });
     const stopMark = new THREE.Mesh(new THREE.PlaneGeometry(12, 0.4), stopMarkMat);
     stopMark.rotation.x = -Math.PI / 2;
-    stopMark.position.set(0, 0.52, 6);
+    stopMark.position.set(0, 0.52, 20);
     group.add(stopMark);
 
     const agvBody = new THREE.Mesh(new THREE.BoxGeometry(10, 1.8, 5), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, metalness: 0.4, roughness: 0.35 }));
-    agvBody.position.set(0, 1.2, 16);
+    agvBody.position.set(0, 1.2, 30);
     agvBody.castShadow = true;
     agvBody.receiveShadow = true;
     group.add(agvBody);
 
     const agvCab = new THREE.Mesh(new THREE.BoxGeometry(3, 1.4, 3.8), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 }));
-    agvCab.position.set(-2.5, 2.2, 16);
+    agvCab.position.set(-2.5, 2.2, 30);
     group.add(agvCab);
 
     const wheelGeo = new THREE.CylinderGeometry(0.9, 0.9, 1.2, 24);
@@ -191,7 +191,7 @@ function buildAGVBay() {
         for (const signZ of [-1, 1]) {
             const wheel = new THREE.Mesh(wheelGeo, wheelMat);
             wheel.rotation.z = Math.PI / 2;
-            wheel.position.set(signX * 4.2, 0.7, 16 + signZ * 1.8);
+            wheel.position.set(signX * 4.2, 0.7, 30 + signZ * 1.8);
             wheel.castShadow = true;
             group.add(wheel);
         }
