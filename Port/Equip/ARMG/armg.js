@@ -150,13 +150,18 @@ export class ARMGCrane {
 
     const leftRail = new THREE.Mesh(railGeometry, railMaterial);
     leftRail.position.set(-this.halfSpan, 0.12, 0);
-    leftRail.rotation.y = Math.PI / 2;
+    // leftRail.rotation.y = Math.PI / 2;
     const rightRail = new THREE.Mesh(railGeometry, railMaterial);
     rightRail.position.set(this.halfSpan, 0.12, 0);
-    rightRail.rotation.y = Math.PI / 2;
+    // rightRail.rotation.y = Math.PI / 2;
 
     leftRail.receiveShadow = rightRail.receiveShadow = true;
-    this.group.add(leftRail, rightRail);
+    // Store rails separately so they can be added to scene independently
+    this.rails = [leftRail, rightRail];
+  }
+
+  getRails() {
+    return this.rails;
   }
 
   setTrolleyPosition(localX) {
@@ -198,5 +203,37 @@ export class ARMGCrane {
     }
     this.attachedContainer = null;
     return released;
+  }
+
+  applyManualState({ gantry, trolley, hoist }) {
+    // Gantry: move entire crane along the rail
+    // The crane group's parent position controls gantry movement along the original Z axis (before crane rotation)
+    // But since we rotate the crane 90° around Y, we need to move along the rotated axis
+    // After rotation, the rail direction becomes the world X axis
+    // So we actually need to adjust the crane.group.position based on the rotation
+    
+    // Since crane is rotated 90° (crane.group.rotation.y = Math.PI/2 in main.js)
+    // The gantry movement should be along world X axis (which is crane's local Z after rotation)
+    const gantryRange = 50; // ±50m along rail
+    const gantryOffset = THREE.MathUtils.lerp(-gantryRange, gantryRange, THREE.MathUtils.clamp(gantry, 0, 1));
+    // Don't modify this.group.position here, as it's set in main.js
+    // Instead, we need to handle this differently - store the base position and modify from there
+    // For now, we'll just control trolley and hoist in manual mode
+    
+    // Trolley: move along the cross beam (in crane's local X axis)
+    const trolleyX = THREE.MathUtils.lerp(-this.halfSpan, this.halfSpan + this.cantilever, THREE.MathUtils.clamp(trolley, 0, 1));
+    this.trolleyGroup.position.x = trolleyX;
+
+    // Hoist: move spreader up/down
+    const hoistDepth = THREE.MathUtils.lerp(0, this.maxHoistDepth, THREE.MathUtils.clamp(hoist, 0, 1));
+    this.hoistGroup.position.y = -hoistDepth;
+
+    // Update cable visuals
+    const cableLength = Math.max(1.4, hoistDepth + 1.75);
+    const bottomY = -hoistDepth - 1.75;
+    this.cableMeshes.forEach((mesh) => {
+      mesh.scale.y = cableLength / 1.5;
+      mesh.position.y = (0 + bottomY) / 2;
+    });
   }
 }
