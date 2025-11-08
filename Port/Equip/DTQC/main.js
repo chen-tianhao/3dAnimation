@@ -59,6 +59,7 @@ const apronMat = new THREE.MeshStandardMaterial({ color: 0xd9d9d9, ...materialPa
 const apron = new THREE.Mesh(new THREE.PlaneGeometry(220, 160), apronMat);
 apron.rotation.x = -Math.PI / 2;
 apron.position.y = 0;
+apron.position.z = 30;
 apron.receiveShadow = true;
 scene.add(apron);
 
