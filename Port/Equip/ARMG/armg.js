@@ -87,7 +87,7 @@ export class ARMGCrane {
     const trolleyFrame = new THREE.Mesh(trolleyFrameGeometry, legMaterial);
     trolleyFrame.castShadow = trolleyFrame.receiveShadow = true;
 
-    const trolleyWheelGeometry = new THREE.CylinderGeometry(0.5, 0.5, this.trolleyWidth, 16);
+    const trolleyWheelGeometry = new THREE.CylinderGeometry(0.5, 0.5, this.trolleyWidth/6, 16);
     const trolleyWheelMaterial = new THREE.MeshStandardMaterial({ color: WALKWAY_COLOR, metalness: 0.3, roughness: 0.4 });
     const wheels = new THREE.Group();
 

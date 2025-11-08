@@ -20,12 +20,12 @@ const sceneElement = document.getElementById("scene");
 sceneElement.appendChild(renderer.domElement);
 
 const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
-camera.position.set(-34, 20, 34);
+camera.position.set(-50, 15, -30);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.target.set(8, 6, 0);
+controls.target.set(50, 5, 30);
 controls.update();
 
 const resizeRenderer = () => {
@@ -86,9 +86,9 @@ const createAxes = (length) => {
   return group;
 };
 
-const axes = createAxes(5);
-axes.position.set(-20, 0.1, -20);
-scene.add(axes);
+// const axes = createAxes(5);
+// axes.position.set(-20, 0.1, -20);
+// scene.add(axes);
 
 const crane = new ARMGCrane({ railSpan: 40, hoistHeight: 18.2, cantilever: 7.5, trolleyWidth: 6 });
 crane.group.rotation.y = Math.PI / 2;
@@ -126,7 +126,7 @@ const randomContainerColor = () => {
 const createAGV = () => {
   const group = new THREE.Group();
   const chassisHeight = 1.2;
-  const chassis = new THREE.Mesh(new THREE.BoxGeometry(14, chassisHeight, 3.6), new THREE.MeshStandardMaterial({ color: 0x3c4758, metalness: 0.2, roughness: 0.8 }));
+  const chassis = new THREE.Mesh(new THREE.BoxGeometry(14, chassisHeight, 3.6), new THREE.MeshStandardMaterial({ color: 0xf4d03f, metalness: 0.2, roughness: 0.8 }));
   chassis.position.y = chassisHeight / 2;
   chassis.castShadow = chassis.receiveShadow = true;
   group.add(chassis);
@@ -134,13 +134,13 @@ const createAGV = () => {
   const wheelGeometry = new THREE.CylinderGeometry(0.7, 0.7, 1.0, 24);
   const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x1a202c, metalness: 0.4, roughness: 0.4 });
 
-  for (let i = 0; i < 8; i += 1) {
+  for (let i = 0; i < 4; i += 1) {
     const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
     wheel.rotation.z = Math.PI / 2;
     wheel.position.set(
-      -5 + (i % 4) * 3.4,
+      -5 + (i % 2) * 10,
       0.35,
-      i < 4 ? -1.6 : 1.6,
+      i < 2 ? -1.6 : 1.6,
     );
     wheel.castShadow = wheel.receiveShadow = true;
     group.add(wheel);
@@ -162,7 +162,7 @@ const createYardBlock = () => {
   yardGroup.add(pad);
 
   const rows = 10;
-  const cols = 6;
+  const cols = 12;
   const slotSpacingX = containerSize.length + containerGap; // 6.1 + 0.25 = 6.35
   const slotSpacingZ = containerSize.width + containerGap; // 2.44 + 0.25 = 2.69
   const originX = -((cols - 1) * slotSpacingX) / 2;
@@ -170,16 +170,16 @@ const createYardBlock = () => {
 
   const slots = [];
   const initialLayout = [
-    [1, 1, 0, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-    [2, 1, 1, 2, 1, 1],
-    [1, 1, 2, 1, 1, 2],
-    [2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2],
-    [2, 2, 2, 2, 2, 2],
-    [3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3],
-    [3, 3, 3, 3, 3, 3],
+    [1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [2, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 1],
+    [1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2],
+    [2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 3, 3],
+    [2, 3, 2, 2, 2, 3, 2, 3, 2, 3, 2, 2],
+    [3, 2, 2, 2, 3, 2, 2, 2, 2, 3, 3, 2],
+    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+    [3, 4, 3, 3, 4, 4, 3, 3, 3, 4, 3, 4],
+    [3, 3, 4, 3, 3, 3, 3, 4, 4, 3, 4, 3],
   ];
 
   for (let row = 0; row < rows; row += 1) {
